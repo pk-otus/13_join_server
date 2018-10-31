@@ -9,7 +9,7 @@ before_script:
   - sudo apt-get update
   - export CXX=/usr/bin/g++-7
   - export CC=/usr/bin/gcc-7
-
+  - sudo apt-get install libboost-test-dev -y
 script: 
   - cmake .
   - cmake --build .
