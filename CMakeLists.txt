@@ -4,9 +4,9 @@ if (DEFINED ENV{TRAVIS_BUILD_NUMBER})
    project(join_server VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 else()
    project(join_server VERSION 0.0.1)
+   find_package(Boost COMPONENTS system REQUIRED)
 endif()
 
-find_package(Boost COMPONENTS system REQUIRED)
 find_package(GTest REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
