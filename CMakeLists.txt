@@ -7,7 +7,7 @@ else()
 endif()
 
 find_package(GTest REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS system REQUIRED)
 
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 file(GLOB HEADER_FILES ${INCLUDE_DIR}/*.h)
