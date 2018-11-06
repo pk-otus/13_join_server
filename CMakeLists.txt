@@ -6,12 +6,16 @@ else()
    project(join_server VERSION 0.0.1)
 endif()
 
-find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS system REQUIRED)
+find_package(GTest REQUIRED)
 
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
-file(GLOB HEADER_FILES	${INCLUDE_DIR}/*.h)
+file(GLOB HEADER_FILES ${INCLUDE_DIR}/*.h)
 add_executable(join_server ${HEADER_FILES} main.cpp)
 
+add_executable(join_server_tests ${HEADER_FILES} test/test_main.cpp)
+
+set_target_properties(join_server_tests PROPERTIES INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS} )
 
 set_target_properties(join_server PROPERTIES
 	CXX_STANDARD 14
@@ -22,9 +26,20 @@ set_target_properties(join_server PROPERTIES
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set_target_properties(join_server PROPERTIES COMPILE_OPTIONS -W3)
+	target_link_libraries(join_server ${Boost_LIBRARIES} )
+	target_link_libraries(join_server_tests ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
 else()
 	set_target_properties(join_server PROPERTIES COMPILE_OPTIONS -Wpedantic -Wall -Wextra)
+	target_link_libraries(join_server pthread ${Boost_LIBRARIES} )
+	target_link_libraries(join_server_tests pthread ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
 endif()
+
+enable_testing()
+add_test(test_symmetric_difference	join_server_tests)
+add_test(test_intersection			join_server_tests)
+add_test(test_output				join_server_tests)
+add_test(test_commands				join_server_tests)
+add_test(test_command_errors		join_server_tests)
 
 install(TARGETS join_server RUNTIME DESTINATION bin)
 
