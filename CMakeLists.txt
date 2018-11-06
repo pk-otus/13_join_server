@@ -9,6 +9,8 @@ endif()
 find_package(Boost COMPONENTS system REQUIRED)
 find_package(GTest REQUIRED)
 
+include_directories(${Boost_INCLUDE_DIR})
+
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 file(GLOB HEADER_FILES ${INCLUDE_DIR}/*.h)
 add_executable(join_server ${HEADER_FILES} main.cpp)

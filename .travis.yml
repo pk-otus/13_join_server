@@ -10,6 +10,14 @@ before_script:
   - export CXX=/usr/bin/g++-7
   - export CC=/usr/bin/gcc-7
   - sudo apt-get install libboost-test-dev -y
+  - sudo apt-get install libgtest-dev cmake -y
+
+  - cd /usr/src/gtest
+  - sudo cmake .
+  - sudo make
+  - sudo cp *.a /usr/lib
+  - cd "${TRAVIS_BUILD_DIR}"   
+  
 script: 
   - cmake .
   - cmake --build .
