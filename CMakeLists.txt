@@ -3,13 +3,11 @@ cmake_minimum_required(VERSION 3.2)
 if (DEFINED ENV{TRAVIS_BUILD_NUMBER})
    project(join_server VERSION 0.0.$ENV{TRAVIS_BUILD_NUMBER})
 else()
-   project(join_server VERSION 0.0.1)
-   find_package(Boost COMPONENTS system REQUIRED)
+   project(join_server VERSION 0.0.1)   
 endif()
 
 find_package(GTest REQUIRED)
-
-include_directories(${Boost_INCLUDE_DIR})
+find_package(Boost REQUIRED)
 
 set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 file(GLOB HEADER_FILES ${INCLUDE_DIR}/*.h)
