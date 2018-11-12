@@ -1,0 +1,1 @@
+cat tablea.txt | nc localhost 9000 &

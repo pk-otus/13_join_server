@@ -13,16 +13,17 @@ set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 file(GLOB HEADER_FILES ${INCLUDE_DIR}/*.h)
 add_executable(join_server ${HEADER_FILES} main.cpp)
 
-add_executable(join_server_tests ${HEADER_FILES} test/test_main.cpp)
-
-set_target_properties(join_server_tests PROPERTIES INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS} )
-
 set_target_properties(join_server PROPERTIES
 	CXX_STANDARD 14
 	CXX_STANDARD_REQUIRED ON
 	COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
 	INCLUDE_DIRECTORIES "${Boost_INCLUDE_DIR};${INCLUDE_DIR}"
 )
+
+enable_testing()
+add_executable(join_server_tests ${HEADER_FILES} test/test_main.cpp)
+
+set_target_properties(join_server_tests PROPERTIES INCLUDE_DIRECTORIES ${GTEST_INCLUDE_DIRS} )
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 	set_target_properties(join_server PROPERTIES COMPILE_OPTIONS -W3)
@@ -34,7 +35,7 @@ else()
 	target_link_libraries(join_server_tests pthread ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
 endif()
 
-enable_testing()
+
 add_test(test_symmetric_difference	join_server_tests)
 add_test(test_intersection			join_server_tests)
 add_test(test_output				join_server_tests)

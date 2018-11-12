@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <iostream>
 #include <queue>
 #include <thread>
@@ -36,7 +37,7 @@ namespace join_server
 		void consumer_thread()
 		{
 			while(true)
-			{
+			{						
 				try 
 				{
 					std::unique_lock<std::mutex> lock(guard_mutex);
@@ -51,8 +52,9 @@ namespace join_server
 						write(*psock, ba::buffer(result, result.size()));
 					}
 				}
-				catch (const std::exception &e) {
-					std::cerr << e.what() << std::endl;
+				catch (const std::exception &e) 
+				{
+					std::cout << "consumer thread error: " << e.what() << '\n';
 					break;
 				}
 
@@ -71,26 +73,33 @@ namespace join_server
 											std::istreambuf_iterator<char>());
 
 					str.erase(std::remove_if(str.begin(), str.end(),
-						[](char chr) { return chr == '\r' || chr == '\n'; }), str.end());
+						[](char chr) { return chr == '\r'; }), str.end());
 
-					auto cmd = abstract_command::CreateCommand(str);
-
-					if (cmd)
+					size_t pos_end;					
+					do
 					{
+						pos_end = str.find('\n');
+						auto str_cmd = str.substr(0, pos_end);
+						str = str.substr(pos_end + 1);
+												
+						if (auto cmd = abstract_command::CreateCommand(str_cmd))
 						{
-							std::lock_guard<std::mutex> lock(guard_mutex);
-							q.push(std::make_pair(sock, std::move(cmd)));
+							{
+								std::lock_guard<std::mutex> lock(guard_mutex);
+								q.push(std::make_pair(sock, std::move(cmd)));
+							}
+							cond_var.notify_one();
 						}
-						cond_var.notify_one();
-					}
-					else
-					{
-						auto result = error_string(error_code::parse_error) + '\n';
-						write(*sock, ba::buffer(result, result.size()));
-					}					
+						else
+						{
+							auto result = error_string(error_code::parse_error) + '\n';
+							write(*sock, ba::buffer(result, result.size()));
+						}
+					} 
+					while (std::string::npos != pos_end && !str.empty());
 				}
 				catch (const std::exception &e) {
-					std::cerr << e.what() << std::endl;
+					std::cout << "producer thread error: " << e.what() << '\n';
 					break;
 				}
 			}
